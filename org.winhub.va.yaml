@@ -1,0 +1,126 @@
+id: org.winhub.va
+runtime: org.freedesktop.Platform
+sdk: org.freedesktop.Sdk
+runtime-version: '22.08'
+finish-args:
+  - --device=dri
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --socket=pulseaudio
+  - --share=network
+  - --filesystem=host
+  - --env=LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu/GL/default/lib/vdpau
+command: vainfo
+cleanup:
+  - /include
+  - /lib/cmake
+  - /lib/pkgconfig
+  - '*.a'
+  - '*.la'
+modules:
+  - name: libva-utils
+    buildsystem: meson
+    sources:
+      - type: archive
+        url: https://github.com/intel/libva-utils/archive/refs/tags/2.18.2.tar.gz
+        sha256: c4c0555c96ca678f9ac47fbb56f0ae56ca39fd50fe3553bae5cb13117bfcb406
+
+  - name: vdpauinfo
+    sources:
+      - type: archive
+        url: https://gitlab.freedesktop.org/vdpau/vdpauinfo/-/archive/1.5/vdpauinfo-1.5.tar.gz
+        sha256: 1878d54f6732d02cedef8eabe77e23fc2239b4ec202612403a383f4140a17bc3
+
+  - name: x264
+    config-opts:
+      - --enable-pic
+      - --enable-shared
+    sources:
+      - type: git
+        url: https://code.videolan.org/videolan/x264.git
+        commit: a8b68ebfaa68621b5ac8907610d3335971839d52
+
+  - name: x265
+    builddir: true
+    subdir: source
+    buildsystem: cmake-ninja
+    config-opts:
+      - -DCMAKE_BUILD_TYPE=RelWithDebInfo
+      - -DBUILD_SHARED_LIBS=ON
+      - -DCMAKE_POSITION_INDEPENDENT_CODE=ON
+    sources:
+      - type: archive
+        url: https://bitbucket.org/multicoreware/x265_git/downloads/x265_3.5.tar.gz
+        sha256: e70a3335cacacbba0b3a20ec6fecd6783932288ebc8163ad74bcc9606477cae8
+        x-checker-data:
+          type: anitya
+          project-id: 7275
+          url-template: https://bitbucket.org/multicoreware/x265_git/downloads/x265_$version.tar.gz
+
+  - name: dav1d
+    buildsystem: meson
+    sources:
+      - type: archive
+        url: https://download.videolan.org/videolan/dav1d/1.2.1/dav1d-1.2.1.tar.xz
+        sha256: 4e33eb61ec54c768a16da0cf8fa0928b4c4593f5f804a3c887d4a21c318340b2
+        x-checker-data:
+          type: anitya
+          project-id: 18920
+          url-template: https://download.videolan.org/videolan/dav1d/$version/dav1d-$version.tar.xz
+
+  - name: ffmpeg
+    config-opts:
+      - --enable-pic
+      - --enable-shared
+      - --disable-doc
+      - --disable-static
+      - --enable-gpl
+      - --enable-libx264
+      - --enable-libx265
+      - --enable-libvpx
+      - --enable-libmp3lame
+      - --enable-libvorbis
+      - --enable-libopus
+    sources:
+      - type: archive
+        url: https://ffmpeg.org/releases/ffmpeg-6.0.tar.xz
+        sha256: 57be87c22d9b49c112b6d24bc67d42508660e6b718b3db89c44e47e289137082
+        x-checker-data:
+          type: anitya
+          project-id: 5405
+          versions:
+            '>=': '4'
+            '<': '5'
+          url-template: https://ffmpeg.org/releases/ffmpeg-$version.tar.xz
+
+  - name: yasm
+    build-options:
+      - -ffat-lto-objects
+    sources:
+      - type: archive
+        url: https://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz
+        sha256: 3dce6601b495f5b3d45b59f7d2492a340ee7e84b5beca17e48f862502bd5603f
+
+  - name: mplayer
+    sources:
+      - type: archive
+        url: https://mplayerhq.hu/MPlayer/releases/MPlayer-1.5.tar.gz
+        sha256: 3244bb8af3f3a1189ebba161ac3a495491ca637171e07875d9b50442ff72cefd
+
+  - name: xine-lib
+    config-opts:
+      - --enable-antialiasing
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/project/xine/xine-lib/1.2.13/xine-lib-1.2.13.tar.xz
+        sha256: 5f10d6d718a4a51c17ed1b32b031d4f9b80b061e8276535b2be31e5ac4b75e6f
+
+  - name: xine-ui
+    config-opts:
+      - --with-x
+      - --without-caca
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/xine/xine-ui-0.99.14.tar.xz
+        sha256: d4d490d5cece70e2bb9849c9e482f2cf87af0302d451b614476fdcc3642cd9c3
